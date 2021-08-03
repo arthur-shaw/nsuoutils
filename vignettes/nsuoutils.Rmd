@@ -1,0 +1,174 @@
+---
+title: "Guide de démarrage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Guide de démarrage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Feuille de route
+
+- [Préparatifs](#préparatifs)
+- [Fusionner les données](#fusionner-les-données)
+- [Classer les images](#classer-les-images)
+- [Comment mettre à jour](#comment-mettre-à-jour)
+
+## Préparatifs
+
+### Organiser les fichiers
+
+Avant de tenter de fusionner, organiser les fichiers par enquête: un répertoire pour les NSU de consommation; un autre pour les NSU de production. 
+
+Voici un exemple du contenu d'un répertoire pour les NSU de consommation:
+
+```{r, eval = TRUE, echo = FALSE}
+fs::dir_tree(path = "C:/Users/wb393438/OneDrive - WBG/EHCVM2/nsu/nsu_combine_data/data/datansubrut/", recurse = 0, type = "directory")
+```
+
+### Identifier les répertoires
+
+Afin d'adapter le programme de fusion, il faut spécifier deux répertoires:
+
+1. `dir_in`, le répertoire où se trouvent les fichiers à joindre;
+1. `dir_out`, le répertoire où sauvegarder les bases résultantes
+
+Par exemple, supposons que les données des NSU de consommation sont organisés comme suit:
+
+[INSERT image/file map of folders]
+
+Dans cet exemple, le sous-répertoire `entree` contient les données brutes--autrement dit, les données d'entrée dans la procédure de fusion. Le sous-répertoire `sortie` contient les données fusionnées--autrement dit, le
+
+Avec la fonction `combine_nsu_data()`, qui est responsable de la fusion des bases, on doit spécifier les répertoires ainsi :
+
+```{r, echo=TRUE}
+combine_nsu_data(
+    dir_in = "C:/EHCVM/NSU/consommation/entree/",
+    dir_out = "C:/EHCVM/NSU/consommation/sortie/"
+)
+```
+
+Notez bien que les répertoires doivent:
+
+- être spécifiés avec des slashs (i.e., "/") au lieu des anti-slashs (i.e., "\")
+- se terminer en un slash (e.g., `"C:/EHCVM/NSU/consommation/entree/"`)
+- être le répertoire "parent" des répertoires "enfant" qui contiennent des données
+
+Voici une exemple du dernier point:
+
+[Show screenshot/folder tree of folder with sub-folders]
+
+### Décrire les sous-répertoires avec données
+
+La fonction de fusion `combine_nsu_data()` parcourt tous les sous-répertoires du répertoire indiqué dans `dir_in`. Certains peuvent ne pas contenir des données.
+
+Pour anticiper ce genre de cas, la fonction `combine_nsu_data()` admet un argument pour identifier les sous répertoires qui contiennent les données. Pour voir l'intérêt, imagineons qu'un répertoire loge des sous-répertoire de données ainsi que des sous-répertoires d'images. Pour que la fonction marche correctement, il faut sélectionner seulement les sous-répertoires de données. Par défaut, la fonction suppose que les sous-répertoires de données ont "_STATA_" dans le nom.
+
+```{r, echo=TRUE}
+combine_nsu_data(
+    dir_in = "C:/EHCVM/NSU/consommation/entree/",
+    dir_regexp = "_STATA_",
+    dir_out = "C:/EHCVM/NSU/consommation/sortie/"
+)
+```
+
+Mais l'argument `dir_regexp` permet de s'adapter à des situations différentes. Par exemple, où les sous-répertoires aurait le `data` dans le nom:
+
+```{r, echo=TRUE}
+combine_nsu_data(
+    dir_in = "C:/EHCVM/NSU/consommation/entree/",
+    dir_regexp = "data",
+    dir_out = "C:/EHCVM/NSU/consommation/sortie/"
+)
+```
+
+## Fusionner les données
+
+La fonction `combine_nsu_data()` accomplit toutes les actions de fusion:
+
+- Joindre les bases du même type
+- Gérer les étiquettes de valeur
+- Sauvegarder des fichier Stata
+
+Pour chaque type de fichier, la fonction
+
+- Parcourt tous les sous-répertoires
+- Répertorie les fichiers de type
+- Fusionne les étiquettes de valeur
+- Fusionne les les bases
+- Sauvegarde un fichier Stata qui porte le nom du type de fichier (i.e., unitesFixes, releve, unitesautre1, autre1releve, unitesautre2, autre2releve)
+
+En plus, la fonction joint les fichiers avec des informations sur les marchés où les relevés ont été pris.
+
+Pour accomplir ceci, il suffit de lancer une fonction en spécifiant correctement les paramétres:
+
+```{r, echo=TRUE}
+combine_nsu_data(
+    dir_in = "C:/EHCVM/NSU/consommation/entree/",
+    dir_regexp = "_STATA_",
+    dir_out = "C:/EHCVM/NSU/consommation/sortie/"
+)
+```
+
+## Classer les images
+
+Les images sont regroupés comme suit dans les fichiers exportés par Survey Solutions:
+
+[INSERT image or file tree of images]
+
+Pour être utiles, les images sont mieux regroupées par produit-unité.
+
+Pour en arriver là, il faut invoquer trois fonctions:
+
+- `inventory_product_units()`
+- `create_image_dirs()`
+- `sort_images()`
+
+La fonction `inventory_product_units()` crée à partir des bases fusionnées un inventaire des produits-unités avec images. 
+
+La fonction `create_image_dirs()` utilise cet inventaire de produits-unités pour savoir quels dossiers créer. En premier lieu, elle crée un répertoire par produit--où nom du produit correspond au nom court qui parait dans les bases. Ensuite, elle crée, à l'intérieur du dossier produit, un sous-répertoire pour chaque unité. Le résultat: un système de répertoires pour héberger les images.
+
+La fonction `sort_images()` classe chaque image dans le bon répertoire. En plus, elle adjoint au nom du fichier le `interview__key` de l'entretien d'où l'image est tirée. Ceci permet accomplit deux buts en même temps. Premièrement, il aide à savoir de quel entretien chaque image est sortie. Deuxièment, il rend le nom de chaque image unique, pour éviter d'écraser deux images de la même unité (e.g., q109_oignon___138.jpg qui paraît dans les entretiens 11-11-11-11 et 22-22-22-22).
+
+## Comment mettre à jour
+
+Ces actions--la fusion des bases et le classement des images--devront être refaites régulièrement au fur et à mesure que l'enquête NSU progress.
+
+Comment faire? La solution est simple: relancer les fonctions. La fusion des bases sera faites à nouveau et intégrera de nouvelles observations. Le classement des images sera
+
+Pour ce faire, il suffit de
+
+```{r, echo = TRUE}
+# fusionner les données afin d'intégrer les nouvelles observations
+combine_nsu_data(
+    dir_in = "C:/EHCVM/NSU/consommation/entree/",
+    dir_regexp = "_STATA_",
+    dir_out = "C:/EHCVM/NSU/consommation/sortie/"
+)
+
+# refaire l'inventaire des produits-unités
+inventaire <- inventory_product_units(dir = "C:/EHCVM/NSU/consommation/sortie/")
+
+# créer des répertoires pour les produits-unités
+# seuls les nouveaux répertoires seront créés; les anciens resteront
+create_image_dirs(
+    inventory_df = inventaire,
+    dir = 
+)
+
+# copier les images depuis les répertoires d'origine vers les répertoires nouvellement créés
+sort_images(
+    inventory_df = inventaire,
+    dir_in = ,
+    image_dir_pattern = ,
+    dir_out = 
+)
+```
