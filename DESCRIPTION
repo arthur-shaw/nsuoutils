@@ -11,6 +11,8 @@ Description: Fournit des fonctions pour mieux gérer les données et les images
     Pour les données, un mécanisme pour fusionner les bases. 
     Pour les images, une fonction pour classer les images selon le produit et unité captée. 
 License: MIT + file LICENSE
+URL: https://github.com/arthur-shaw/nsuoutils
+BugReports: https://github.com/arthur-shaw/nsuoutils/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
