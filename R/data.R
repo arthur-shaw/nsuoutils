@@ -9,8 +9,6 @@
 #' 
 #' @importFrom fs dir_ls path_file
 #' @importFrom stringr str_subset
-#' 
-#' @export
 get_matching_files <- function(
     dir, 
     pattern
@@ -47,8 +45,6 @@ get_matching_files <- function(
 #' 
 #' @importFrom stringr str_replace
 #' @importFrom haven read_dta
-#' 
-#' @export 
 ingest_dta_file <- function(
     dir,
     file_name
@@ -74,8 +70,6 @@ ingest_dta_file <- function(
 #' @importFrom stringr str_detect
 #' @importFrom assertthat assert_that
 #' @importFrom glue glue glue_collapse
-#' 
-#' @export 
 check_cols <- function(
     df,
     df_name,
@@ -247,8 +241,6 @@ cols_found <- names(df)
 #' 
 #' @importFrom dplyr `%>%` mutate across starts_with
 #' @importFrom rlang .data
-#' 
-#' @export 
 correct_col_type <- function(
     df, 
     df_type
@@ -410,8 +402,6 @@ correct_col_type <- function(
 #' 
 #' @importFrom stringr str_subset str_extract str_replace
 #' @importFrom dplyr `%>%` case_when mutate rename_with everything starts_with
-#' 
-#' @export 
 rename_variables <- function(
     df,
     df_type
@@ -526,8 +516,6 @@ rename_variables <- function(
 #' @importFrom labelled add_value_labels
 #' @importFrom stringr str_replace
 #' @importFrom rlang .data
-#' 
-#' @export 
 fix_misc_issues <- function(
     df,
     df_type
@@ -1159,8 +1147,6 @@ combine_nsu_data <- function(
 #' @importFrom purrr map_chr map map2
 #' @importFrom haven read_dta write_dta
 #' @importFrom dplyr mutate select bind_rows
-#' 
-#' @export 
 combine_market_data <- function(
     dir_in,
     dir_regexp = "_STATA_",
