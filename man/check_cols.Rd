@@ -11,7 +11,8 @@ check_cols(df, df_name, df_type)
 
 \item{df_name}{Character. Name of data frame as a character.}
 
-\item{df_type}{Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"}
+\item{df_type}{Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"}
 }
 \description{
 Check whether expected columns are present

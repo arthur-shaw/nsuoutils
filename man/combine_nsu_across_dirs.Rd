@@ -4,14 +4,24 @@
 \alias{combine_nsu_across_dirs}
 \title{Combine all NSU data of the same type across food group directories}
 \usage{
-combine_nsu_across_dirs(dir_in, dir_regexp = "_STATA_", df_type, dir_out)
+combine_nsu_across_dirs(
+  dir_in,
+  dir_regexp = "_STATA_",
+  data_type,
+  df_type,
+  dir_out
+)
 }
 \arguments{
 \item{dir_in}{Character. Root directory where food group sub-directories are located.}
 
 \item{dir_regexp}{Character. Regular expression to identify folders over which to iterate.}
 
-\item{df_type}{Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"}
+\item{data_type}{Character. One of: "consumption", "production".
+For data from markets, "consumption"; for data from farmers, "production".}
+
+\item{df_type}{Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"}
 
 \item{dir_out}{Character. Directory where combined files should be saved.}
 }

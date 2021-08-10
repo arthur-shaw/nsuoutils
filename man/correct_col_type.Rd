@@ -9,7 +9,8 @@ correct_col_type(df, df_type)
 \arguments{
 \item{df}{Data frame whose columns types to check and correct.}
 
-\item{df_type}{Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"}
+\item{df_type}{Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"}
 }
 \value{
 Data frame with column types corrected where applicable.

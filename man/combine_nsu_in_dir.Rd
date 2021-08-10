@@ -4,12 +4,16 @@
 \alias{combine_nsu_in_dir}
 \title{Combine NSU all data of same type in the same directory}
 \usage{
-combine_nsu_in_dir(dir_in, df_type)
+combine_nsu_in_dir(dir_in, data_type, df_type)
 }
 \arguments{
 \item{dir_in}{Character. Directory path whose files should be combined.}
 
-\item{df_type}{Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"}
+\item{data_type}{Character. One of: "consumption", "production".
+For data from markets, "consumption"; for data from farmers, "production".}
+
+\item{df_type}{Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"}
 }
 \description{
 Combine NSU all data of same type in the same directory

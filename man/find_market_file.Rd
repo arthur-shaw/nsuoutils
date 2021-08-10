@@ -7,7 +7,7 @@
 find_market_file(
   dir,
  
-    pattern_to_exclude = "^interview__|^assignment__|^autre2releve_|^unitesautre2|^autre1releve_|^unitesautre1|^releve_|^unitesFixes_"
+    pattern_to_exclude = "^interview__|^assignment__|^autre2releve_|^unites[Aa]utre2|^autre1releve_|^unites[Aa]utre1|^releve_|^unitesFixes_"
 )
 }
 \arguments{

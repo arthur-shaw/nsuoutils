@@ -64,7 +64,8 @@ ingest_dta_file <- function(
 #' 
 #' @param df Data frame. Data frame to check.
 #' @param df_name Character. Name of data frame as a character.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
 #' @importFrom dplyr case_when
 #' @importFrom stringr str_detect
@@ -82,18 +83,46 @@ cols_found <- names(df)
     # unitesFixes
     if (df_type == "unitesFixes") {
 
-        cols_expected <- c(
-            "interview__id", "interview__key", "unitesFixes__id", "produit_nom",
-            "q104", "q105", "q105autre", "q108", "q109a", "q109"
+        fixe_type <- case_when(
+            "q109a" %in% names(df) ~ "consumption",
+            "q110" %in% names(df) ~ "production",
+            TRUE ~ "unknown"
         )
 
-        cols_missing <- cols_expected[!cols_expected %in% cols_found]
-        cols_missing_ms <- dplyr::case_when(
-            !any(stringr::str_detect(cols_found, "q106__[0-9]+")) ~ "q106__*",
-            !any(stringr::str_detect(cols_found, "q107__[0-9]+")) ~ "q107__*",
-            !any(stringr::str_detect(cols_found, "q106__[0-9]+")) & !any(stringr::str_detect(cols_found, "q107__[0-9]+")) ~ c("q106__*", "q107__*"),
-            TRUE ~ NA_character_
-        )
+        if (fixe_type == "consumption") {
+
+            cols_expected <- c(
+                "interview__id", "interview__key", "unitesFixes__id", "produit_nom",
+                "q104", "q105", "q105autre", "q108", "q109a", "q109"
+            )
+
+            cols_missing <- cols_expected[!cols_expected %in% cols_found]
+            cols_missing_ms <- dplyr::case_when(
+                !any(stringr::str_detect(cols_found, "q106__[0-9]+")) ~ "q106__*",
+                !any(stringr::str_detect(cols_found, "q107__[0-9]+")) ~ "q107__*",
+                !any(stringr::str_detect(cols_found, "q106__[0-9]+")) & !any(stringr::str_detect(cols_found, "q107__[0-9]+")) ~ c("q106__*", "q107__*"),
+                TRUE ~ NA_character_
+            )
+            
+        } else if (fixe_type == "production") {
+
+            cols_expected <- c(
+                "interview__key", "interview__id", "unitesFixes__id", "produit_nom", 
+                "q103", "q104", "q105", "q105autre", "q107", "q108", "q109", "q110"
+            )
+
+            cols_missing <- cols_expected[!cols_expected %in% cols_found]
+            cols_missing_ms <- dplyr::case_when(
+                !any(stringr::str_detect(cols_found, "q106__[0-9]+")) ~ "q106__*",
+                TRUE ~ NA_character_
+            )
+
+        } else if (fixe_type == "unknown") {
+
+            stop("Impossible d'identifier le type de base unitesFixes")
+
+        }
+
         cols_missing <- c(cols_missing, cols_missing_ms)
         cols_missing <- cols_missing[!is.na(cols_missing)]
 
@@ -141,6 +170,34 @@ cols_found <- names(df)
         cols_missing <- cols_expected[!cols_expected %in% cols_found]
         cols_missing_ms <- dplyr::case_when(
             !any(stringr::str_detect(cols_found, "q112_autre1__[0-9]+")) ~ "q112_autre1__*",
+            TRUE ~ NA_character_
+        )
+        cols_missing <- c(cols_missing, cols_missing_ms)
+        cols_missing <- cols_missing[!is.na(cols_missing)]
+
+        assertthat::assert_that(
+            length(cols_missing) == 0,
+            msg = glue::glue(
+                "Expected column(s) missing in {df_name}",
+                "Columns missing: {glue::glue_collapse(cols_missing, sep = ', ')}",
+                .sep = "\n"
+            )
+        )
+
+    }
+
+    # unitesAutre1
+    if (df_type == "unitesAutre1") {
+
+        cols_expected <- c(
+            "interview__id", "interview__key", "unitesAutre1__id", "produit_nom",
+            "q103_autre1", "q104_autre1", "q105_autre1", "q107_autre1", 
+            "q108_autre1", "q109_autre1", "q110_autre1"
+        )
+
+        cols_missing <- cols_expected[!cols_expected %in% cols_found]
+        cols_missing_ms <- dplyr::case_when(
+            !any(stringr::str_detect(cols_found, "q106_autre1__[0-9]+")) ~ "q106_autre1__*",
             TRUE ~ NA_character_
         )
         cols_missing <- c(cols_missing, cols_missing_ms)
@@ -205,6 +262,34 @@ cols_found <- names(df)
 
     }
 
+    # unitesAutre2
+    if (df_type == "unitesAutre2") {
+
+        cols_expected <- c(
+            "interview__id", "interview__key", "unitesAutre2__id", "produit_nom",
+            "q102", "q103_autre2", "q104_autre2", "q105_autre2", "q107_autre2", 
+            "q108_autre2", "q109_autre2", "q110_autre2"
+        )
+
+        cols_missing <- cols_expected[!cols_expected %in% cols_found]
+        cols_missing_ms <- dplyr::case_when(
+            !any(stringr::str_detect(cols_found, "q106_autre2__[0-9]+")) ~ "q106_autre2__*",
+            TRUE ~ NA_character_
+        )
+        cols_missing <- c(cols_missing, cols_missing_ms)
+        cols_missing <- cols_missing[!is.na(cols_missing)]
+
+        assertthat::assert_that(
+            length(cols_missing) == 0,
+            msg = glue::glue(
+                "Expected column(s) missing in {df_name}",
+                "Columns missing: {glue::glue_collapse(cols_missing, sep = ', ')}",
+                .sep = "\n"
+            )
+        )
+
+    }
+
     # autre2releve_
     if (df_type == "autre2releve") {
 
@@ -235,7 +320,8 @@ cols_found <- names(df)
 #' Then, if not, change the column's type
 #' 
 #' @param df Data frame whose columns types to check and correct.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
 #' @return Data frame with column types corrected where applicable.
 #' 
@@ -251,25 +337,60 @@ correct_col_type <- function(
             # unitesFixes
             if (df_type == "unitesFixes") {
 
-                dplyr::mutate(.,
-                    # character cols
-                    dplyr::across(
-                        .cols = c(
-                            .data$interview__id, .data$interview__key, 
-                            .data$produit_nom, .data$q105autre, .data$q109
-                        ),
-                        .fns = as.character
-                    ),
-                    # double cols
-                    dplyr::across(
-                        .cols = c(
-                            .data$unitesFixes__id, .data$q104, .data$q105, 
-                            .data$q108, .data$q109a, 
-                            starts_with("q106__"), starts_with("q107__")
-                        ),
-                        .fns = as.double
-                    )
+                fixe_type <- case_when(
+                    "q109a" %in% names(df) ~ "consumption",
+                    "q110" %in% names(df) ~ "production",
+                    TRUE ~ "unknown"
                 )
+
+                if (fixe_type == "consumption") {
+
+                    dplyr::mutate(.,
+                        # character cols
+                        dplyr::across(
+                            .cols = c(
+                                .data$interview__id, .data$interview__key, 
+                                .data$produit_nom, .data$q105autre, .data$q109
+                            ),
+                            .fns = as.character
+                        ),
+                        # double cols
+                        dplyr::across(
+                            .cols = c(
+                                .data$unitesFixes__id, .data$q104, .data$q105, 
+                                .data$q108, .data$q109a, 
+                                starts_with("q106__"), starts_with("q107__")
+                            ),
+                            .fns = as.double
+                        )
+                    )
+
+                } else if (fixe_type == "production") {
+
+                    dplyr::mutate(.,
+                        # character cols
+                        dplyr::across(
+                            .cols = c(
+                                .data$interview__id, .data$interview__key, 
+                                .data$produit_nom, .data$q105autre
+                            ),
+                            .fns = as.character
+                        ),
+                        # double cols
+                        dplyr::across(
+                            .cols = c(
+                                .data$unitesFixes__id, .data$q103, .data$q104, 
+                                .data$q105, .data$q107, .data$q109,
+                                .data$q108, .data$q110, starts_with("q106__")
+                            ),
+                            .fns = as.double
+                        )
+                    )
+
+                } else if (fixe_type == "unknown"){
+                    stop("Impossible de reconnaitre le type de base fixe")
+                }
+
 
             # releve
             } else if (df_type == "releve") {
@@ -310,6 +431,29 @@ correct_col_type <- function(
                         .cols = c(
                             .data$unitesautre1__id, .data$q113_autre1, 
                             starts_with("q112_autre1__")
+                        ),
+                        .fns = as.double
+                    )
+                )
+
+            # unitesAutre1
+            } else if (df_type == "unitesAutre1") {
+
+                dplyr::mutate(.,
+                    # character cols
+                    dplyr::across(
+                        .cols = c(
+                            .data$interview__id, .data$interview__key,
+                            .data$produit_nom
+                        ),
+                        .fns = as.character
+                    ),
+                    # double cols
+                    dplyr::across(
+                        .cols = c(
+                            .data$unitesAutre1__id, .data$q103_autre1, .data$q104_autre1, 
+                            .data$q105_autre1, .data$q107_autre1, .data$q109_autre1,
+                            .data$q108_autre1, .data$q110_autre1, starts_with("q106__")
                         ),
                         .fns = as.double
                     )
@@ -361,6 +505,30 @@ correct_col_type <- function(
                     )
                 )
 
+            # unitesAutre2
+            } else if (df_type == "unitesAutre2") {
+
+                dplyr::mutate(.,
+                    # character cols
+                    dplyr::across(
+                        .cols = c(
+                            .data$interview__id, .data$interview__key,
+                            .data$produit_nom
+                        ),
+                        .fns = as.character
+                    ),
+                    # double cols
+                    dplyr::across(
+                        .cols = c(
+                            .data$unitesAutre2__id, .data$q103_autre2, 
+                            .data$q104_autre2, .data$q105_autre2, .data$q107_autre2, 
+                            .data$q109_autre2, .data$q108_autre2, .data$q110_autre2, 
+                            starts_with("q106_autre2__")
+                        ),
+                        .fns = as.double
+                    )
+                )
+
             # autre2releve
             } else if (df_type == "autre2releve") {
 
@@ -396,7 +564,8 @@ correct_col_type <- function(
 #' Then, overwrite the input df in the global environment with an updated df.
 #' 
 #' @param df Data frame whose columns to rename.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
 #' @return Data frame with whose columns have harmonized names.
 #' 
@@ -406,32 +575,34 @@ rename_variables <- function(
     df,
     df_type
 ) {
-
+    
     get_product_name <- function(
         df,
         pattern
     ) {
-
+        
         column_name <- stringr::str_subset(names(df), pattern = pattern)
-
+        
         product_name <- stringr::str_extract(column_name, pattern = pattern)
-
+        
         return(product_name)
-
+        
     }
-
+    
     # convert `df_type` input into the type of regex needed for tasks below
     pattern <- dplyr::case_when(
         df_type == "unitesFixes" ~ "(?<=unitesFixes_)[A-Za-z0-9]+(?=__id)",
         df_type == "releve" ~ "(?<=releve_)[A-Za-z0-9]+(?=__id)",
         df_type == "unitesautre1" ~ "(?<=unitesautre1)[A-Za-z0-9]+(?=__id)",
+        df_type == "unitesAutre1" ~ "(?<=unitesAutre1_)[A-Za-z0-9]+(?=__id)",
         df_type == "autre1releve" ~ "(?<=autre1releve_)[A-Za-z0-9]+(?=__id)",
         df_type == "unitesautre2" ~ "(?<=unitesautre2)[A-Za-z0-9]+(?=__id)",
+        df_type == "unitesAutre2" ~ "(?<=unitesAutre2_)[A-Za-z0-9]+(?=__id)",
         df_type == "autre2releve" ~ "(?<=autre2releve_)[A-Za-z0-9]+(?=__id)"
     )
-
+    
     produit_nom <- get_product_name(df = df, pattern = pattern)
-
+    
     df_renamed <- df %>%
         dplyr::mutate(produit_nom = produit_nom) %>%
         dplyr::rename_with(
@@ -454,6 +625,17 @@ rename_variables <- function(
                         replacement = ""
                     )
                 )             
+            } else if (df_type == "unitesAutre1") {
+                # roster ID
+                rename_with(
+                    .data = .,
+                    .cols = starts_with("unitesAutre1"),
+                    .fn = ~ stringr::str_replace(
+                        string = .x,
+                        pattern = "(?<=unitesAutre1_)[a-z0-9]+(?=__id)",
+                        replacement = ""
+                    )
+                )
             } else if (df_type == "autre1releve") {
                 # ID from parent roster
                 rename_with(
@@ -476,6 +658,17 @@ rename_variables <- function(
                         replacement = ""
                     )
                 )
+            } else if (df_type == "unitesAutre2") {
+                # roster ID
+                rename_with(
+                    .data = .,
+                    .cols = starts_with("unitesAutre2"),
+                    .fn = ~ stringr::str_replace(
+                        string = .x,
+                        pattern = "(?<=unitesAutre2_)[a-z0-9]+(?=__id)",
+                        replacement = ""
+                    )
+                )
             } else if (df_type == "autre2releve") {
                 # ID from parent roster
                 rename_with(
@@ -490,12 +683,11 @@ rename_variables <- function(
             } else {
                 .
             }
-
-
+                       
         }
-
+    
     return(df_renamed)
-
+    
 }
 
 #' Fix miscellaneous issues with input data
@@ -508,7 +700,8 @@ rename_variables <- function(
 #' - Within file type, group by particular files by checking for file-specific column names
 #' 
 #' @param df Data frame whose disparate issues to fix.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
 #' @return Data frame with corrections, where applicable.
 #' 
@@ -562,6 +755,95 @@ fix_misc_issues <- function(
                     dplyr::rename(
                         .data = .,
                         unitesautre1__id = .data$unitesautre1tmteCctr__id
+                    )
+                } else {
+                    .
+                }
+            }
+
+    } else if (df_type %in% c("unitesAutre1", "unitesAutre2")) {
+
+        df_fixed <- df %>%
+            {
+                if (any(stringr::str_detect(names(df), "q106_pasthe_autre[12]__1"))) {
+                    dplyr::rename_with(
+                        .data = .,
+                        .cols = matches("pasthe"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_pasthe",
+                            replacement = ""
+                        )
+                    )
+                }  else if (any(stringr::str_detect(names(df), "q106_autreag_autre[12]__1"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("autreag"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_autreag",
+                            replacement = ""
+                        )
+                    )                    
+                } else if (any(stringr::str_detect(names(df), "q106_better_autre[12]__1"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("better"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_better",
+                            replacement = ""
+                        )
+                    )                        
+                } else if ("q106_calebas_autre1__1" %in% names(df)) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("calebas"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_calebas",
+                            replacement = ""
+                        )
+                    )
+                } else if ("q106_caleba_autre2__1" %in% names(df)) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("caleba"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_caleba",
+                            replacement = ""
+                        )
+                    )
+                } else if (any(stringr::str_detect(names(df), "q106_gingem_autre[12]__1"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("gingem"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_gingem",
+                            replacement = ""
+                        )
+                    )
+                } else if (any(stringr::str_detect(names(df), "q106_haricotv_autre[12]__1"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("haricotv"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_haricotv",
+                            replacement = ""
+                        )
+                    )
+                } else if (any(stringr::str_detect(names(df), "q106_petitp_autre[12]__1"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("petitp"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_petitp",
+                            replacement = ""
+                        )
                     )
                 } else {
                     .
@@ -710,7 +992,8 @@ label_variables <- function(
 #' Save data to disk in Stata format
 #' 
 #' @param df Data frame to save to disk.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' @param dir Character. Directory where to save data.
 #' 
 #' @importFrom assertthat assert_that
@@ -774,7 +1057,7 @@ save_nsu_data <- function(
 #' @importFrom glue glue
 find_market_file <- function(
     dir,
-    pattern_to_exclude = "^interview__|^assignment__|^autre2releve_|^unitesautre2|^autre1releve_|^unitesautre1|^releve_|^unitesFixes_"
+    pattern_to_exclude = "^interview__|^assignment__|^autre2releve_|^unites[Aa]utre2|^autre1releve_|^unites[Aa]utre1|^releve_|^unitesFixes_"
 ) {
 
     all_files_paths <- fs::dir_ls(dir, type = "file")
@@ -816,7 +1099,10 @@ find_market_file <- function(
 #' Combine NSU all data of same type in the same directory
 #'  
 #' @param dir_in Character. Directory path whose files should be combined.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param data_type Character. One of: "consumption", "production". 
+#' For data from markets, "consumption"; for data from farmers, "production".
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
 #' @importFrom dplyr if_else bind_rows `%>%` slice starts_with everything left_join mutate
 #' @importFrom stringr str_ends
@@ -826,6 +1112,7 @@ find_market_file <- function(
 #' @importFrom tidyr pivot_longer
 combine_nsu_in_dir <- function(
     dir_in,
+    data_type,
     df_type
 ) {
 
@@ -950,13 +1237,18 @@ combine_nsu_in_dir <- function(
     # if so, construct a product name-ID mapping
     if (nrow(market_df) > 0) {
 
+        col_prefix <- dplyr::case_when(
+            data_type == "consumption" ~ "codeProduit_",
+            data_type == "production" ~ "codeCulture_"
+        )
+
         product_name_id_map <- market_df %>%
             dplyr::slice(1) %>% # take first obs, since all observations contain the same information
-            select(starts_with("codeProduit_")) %>% # keep variables whose names contain the product name and whose values contains the code
+            select(starts_with(col_prefix)) %>% # keep variables whose names contain the product name and whose values contains the code
             tidyr::pivot_longer(
                 cols = everything(), 
                 names_to = "produit_nom", 
-                names_prefix = "codeProduit_",
+                names_prefix = col_prefix,
                 values_to = "produit_id"
             )
         # next, construct values labels for product IDs 
@@ -1004,7 +1296,10 @@ combine_nsu_in_dir <- function(
 #' 
 #' @param dir_in Character. Root directory where food group sub-directories are located.
 #' @param dir_regexp Character. Regular expression to identify folders over which to iterate.
-#' @param df_type Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' @param data_type Character. One of: "consumption", "production". 
+#' For data from markets, "consumption"; for data from farmers, "production".
+#' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+#' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' @param dir_out Character. Directory where combined files should be saved.
 #' 
 #' @importFrom fs dir_ls
@@ -1013,6 +1308,7 @@ combine_nsu_in_dir <- function(
 combine_nsu_across_dirs <- function(
     dir_in,
     dir_regexp = "_STATA_",
+    data_type,
     df_type,
     dir_out
 ) {
@@ -1031,7 +1327,8 @@ combine_nsu_across_dirs <- function(
         .x = folders,
         .f = ~ combine_nsu_in_dir(
             dir_in = .x,
-            df_type = df_type
+            df_type = df_type,
+            data_type = data_type
         )
     )
 
@@ -1093,6 +1390,8 @@ combine_nsu_across_dirs <- function(
 #' 
 #' @param dir_in Character. Root directory where food group sub-directories are located.
 #' @param dir_regexp Character. Regular expression to identify folders over which to iterate.
+#' @param data_type Character. One of: "consumption", "production". 
+#' For data from markets, "consumption"; for data from farmers, "production".
 #' @param dir_out Character. Directory where combined files should be saved.
 #' 
 #' @importFrom purrr map walk2
@@ -1102,20 +1401,30 @@ combine_nsu_across_dirs <- function(
 combine_nsu_data <- function(
     dir_in,
     dir_regexp = "_STATA_",
+    data_type, 
     dir_out
 ) {
 
-    file_types <- c(
-        "unitesFixes", "releve", 
-        "unitesautre1", "autre1releve", 
-        "unitesautre2", "autre2releve"
-    )
+    if (data_type == "consumption") {
+
+        file_types <- c(
+            "unitesFixes", "releve", 
+            "unitesautre1", "autre1releve", 
+            "unitesautre2", "autre2releve"
+        )
+    } else if (data_type == "production") {
+
+        file_types <- c("unitesFixes", "unitesAutre1", "unitesAutre2")
+
+    }
+
 
     # create combined data files
     nsu_combined <- purrr::map(
         .x = file_types,
         .f = ~ combine_nsu_across_dirs(
             dir_in = dir_in,
+            data_type = data_type,
             dir_regexp = dir_regexp,
             df_type = .x,
             dir_out = dir_out

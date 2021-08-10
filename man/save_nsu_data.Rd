@@ -9,7 +9,8 @@ save_nsu_data(df, df_type, dir)
 \arguments{
 \item{df}{Data frame to save to disk.}
 
-\item{df_type}{Character. One of: "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"}
+\item{df_type}{Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
+For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"}
 
 \item{dir}{Character. Directory where to save data.}
 }
