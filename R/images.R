@@ -153,8 +153,6 @@ create_image_dirs <- function(
 #' @importFrom stringr str_extract str_starts
 #' @importFrom glue glue glue_collapse
 #' @importFrom rlang .data
-#' 
-#' @export 
 sort_images_obs <- function(
     dir_in,
     unit_labels,

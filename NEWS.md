@@ -1,6 +1,6 @@
 # nsuoutils 0.1.1
 
-- Exporter les fonctions `sort_images_product()` et `sort_images()`
+- Exporter les fonctions `create_image_dirs()` et `sort_images()`.
 
 # nsuoutils 0.1.0
 
