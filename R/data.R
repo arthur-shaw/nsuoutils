@@ -1456,6 +1456,8 @@ combine_nsu_data <- function(
 #' @importFrom purrr map_chr map map2
 #' @importFrom haven read_dta write_dta
 #' @importFrom dplyr mutate select bind_rows
+#' 
+#' @export 
 combine_market_data <- function(
     dir_in,
     dir_regexp = "_STATA_",
