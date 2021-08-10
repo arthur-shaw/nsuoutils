@@ -1,3 +1,8 @@
+# nsuoutils 0.1.4
+
+- Corrections diverses dans les fonctions de classement d'images
+- Ajout de documentation pour le paramètre `data_type` de la fonction `combine_market_data`
+
 # nsuoutils 0.1.3
 
 - Ajouter un paramètre `data_type` à la fonction `combine_market_data()` pour que les fichiers de sortie aient un nom approprié selon qu'il s'agit de données de consommation ou de production (i.e., "marches" ou "fermes", respectivement).

@@ -182,13 +182,13 @@ sort_images_obs <- function(
             interview_key = stringr::str_extract(.data$files, pattern = "(?<=)[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"),
             image_name_new = glue::glue("{.data$question}_{.data$product_name}___{.data$unit_code}__{.data$interview_key}.jpg")
         ) %>%
-        labelled::set_value_labels(unit_code = .data$unit_labels) %>%
+        labelled::set_value_labels(unit_code = unit_labels) %>%
         dplyr::mutate(
             unit_txt = haven::as_factor(.data$unit_code, levels = "labels"),
             path_new = dplyr::case_when(
                 # TODO: replace `image_out_dir` below with param name
-                .data$question %in% c("q109", "q114") ~ glue::glue("{.data$dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}"),
-                .data$question == "q119" ~ glue::glue("{.data$dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}")
+                .data$question %in% c("q109", "q114") ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}"),
+                .data$question == "q119" ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}")
             ),
             dir_old = fs::path_dir(.data$files),
             file_old = fs::path_file(.data$files),

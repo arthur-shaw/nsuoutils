@@ -1450,6 +1450,8 @@ combine_nsu_data <- function(
 #' 
 #' @param dir_in Character. Root directory where food group sub-directories are located.
 #' @param dir_regexp Character. Regular expression to identify folders over which to iterate.
+#' @param data_type Character. One of: "consumption", "production". 
+#' For data from markets, "consumption"; for data from farmers, "production".
 #' @param dir_out Character. Directory where combined files should be saved.
 #' 
 #' @importFrom fs dir_ls
