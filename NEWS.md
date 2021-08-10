@@ -1,3 +1,7 @@
+# nsuoutils 0.1.2
+
+- Exporter `combine_market_data()`
+
 # nsuoutils 0.1.1
 
 - Exporter les fonctions `create_image_dirs()` et `sort_images()`.

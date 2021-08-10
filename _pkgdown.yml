@@ -5,6 +5,7 @@ reference:
 - title: "Données"
 - contents:
   - combine_nsu_data
+  - combine_market_data
 
 - title: "Images"
 - contents:
