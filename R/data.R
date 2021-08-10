@@ -1461,6 +1461,7 @@ combine_nsu_data <- function(
 combine_market_data <- function(
     dir_in,
     dir_regexp = "_STATA_",
+    data_type,
     dir_out
 ) {
 
@@ -1514,7 +1515,11 @@ combine_market_data <- function(
     market_df <- dplyr::bind_rows(market_dfs_edited)
 
     # save df to disk as Stata file
-    haven::write_dta(data = market_df, path = paste0(dir_out, "/", "marches.dta"))
+    file_name <- dplyr::case_when(
+        data_type == "consumption" ~ "marches.dta",
+        data_type == "production" ~ "fermes.dta"
+    )
+    haven::write_dta(data = market_df, path = paste0(dir_out, "/", file_name))
 
 }
 

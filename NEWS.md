@@ -1,3 +1,7 @@
+# nsuoutils 0.1.3
+
+- Ajouter un paramètre `data_type` à la fonction `combine_market_data()` pour que les fichiers de sortie aient un nom approprié selon qu'il s'agit de données de consommation ou de production (i.e., "marches" ou "fermes", respectivement).
+
 # nsuoutils 0.1.2
 
 - Exporter `combine_market_data()`

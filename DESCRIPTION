@@ -1,6 +1,6 @@
 Package: nsuoutils
 Title: Facilite la Manipulation des Données et des Images de l'Enquête NSU
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: 
     person(given = "Arthur",
            family = "Shaw",
