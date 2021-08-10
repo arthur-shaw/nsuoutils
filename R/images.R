@@ -106,6 +106,8 @@ create_unit_dirs <- function(
 #' 
 #' @param inventory_df Data frame. Base créée par `inventory_product_units()` qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.
 #' @param dir Character. Répertoire racine où les répertoires produit-unité doivent être créés.
+#' 
+#' @export 
 create_image_dirs <- function(
     inventory_df,
     dir
@@ -151,6 +153,8 @@ create_image_dirs <- function(
 #' @importFrom stringr str_extract str_starts
 #' @importFrom glue glue glue_collapse
 #' @importFrom rlang .data
+#' 
+#' @export 
 sort_images_obs <- function(
     dir_in,
     unit_labels,
