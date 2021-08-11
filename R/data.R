@@ -744,6 +744,31 @@ fix_misc_issues <- function(
                 } else {
                     .
                 }
+            } %>%
+            {
+                if (any(stringr::str_detect(names(df), "q112_courgete_autre1__"))) {
+                    dplyr::rename_with(
+                        .data = .,
+                        .cols = dplyr::matches("courgete"),
+                        .fn = ~ stringr::str_replace(
+                            string = .x,
+                            pattern = "_courgete",
+                            replacement = ""
+                        )
+                    )
+                } else if (any(stringr::str_detect(names(df), "q112farinloc[12]_autre1__0"))) {
+                    dplyr::rename_with(
+                        .data = .,
+                        .cols = dplyr::matches("farinloc[12]"),
+                        .fn = ~ stringr::str_replace(
+                            string = .x,
+                            pattern = "farinloc[12]",
+                            replacement = ""
+                        )
+                    )
+                } else {
+                    .
+                }
             }
 
     } else if (df_type == "autre1releve") {
@@ -845,6 +870,16 @@ fix_misc_issues <- function(
                             replacement = ""
                         )
                     )
+                } else if (any(stringr::str_detect(names(df), "q106_arachid_autre[12]__"))) {
+                    rename_with(
+                        .data = .,
+                        .cols = matches("arachid"),
+                        .fn = ~ str_replace(
+                            string = .x,
+                            pattern = "_arachid",
+                            replacement = ""
+                        )
+                    )
                 } else {
                     .
                 }
@@ -879,6 +914,31 @@ fix_misc_issues <- function(
                 } else {
                     .
                 }
+            } %>%
+            {
+                if (any(stringr::str_detect(names(df), "q117_courgete_autre2__"))) {
+                    dplyr::rename_with(
+                        .data = .,
+                        .cols = dplyr::matches("courgete"),
+                        .fn = ~ stringr::str_replace(
+                            string = .x,
+                            pattern = "_courgete",
+                            replacement = ""
+                        )
+                    )
+                } else if (any(stringr::str_detect(names(df), "q117farinloc[12]_autre2__0"))) {
+                    dplyr::rename_with(
+                        .data = .,
+                        .cols = dplyr::matches("farinloc[12]"),
+                        .fn = ~ stringr::str_replace(
+                            string = .x,
+                            pattern = "farinloc[12]",
+                            replacement = ""
+                        )
+                    )
+                } else {
+                    .
+                }                
             }
 
     } else if (df_type == "autre2releve") {
