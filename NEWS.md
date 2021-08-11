@@ -1,3 +1,7 @@
+# nsuoutils 0.1.5
+
+- Appliquer des corrections identifées dans les bases du Niger: des noms de variables qui ne suivent pas les consignes.
+
 # nsuoutils 0.1.4
 
 - Corrections diverses dans les fonctions de classement d'images
