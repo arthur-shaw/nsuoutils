@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nsuoutils</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
     <p>Créer un répertoire pour chaque produit-unité</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_image_dirs</span><span class='op'>(</span><span class='va'>inventory_df</span>, <span class='va'>dir</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>create_image_dirs</span><span class='op'>(</span><span class='va'>inventory_df</span>, <span class='va'>market_path</span>, <span class='va'>strata_vars</span>, <span class='va'>dir</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,6 +139,14 @@
     <tr>
       <th>inventory_df</th>
       <td><p>Data frame. Base créée par <code><a href='inventory_product_units.html'>inventory_product_units()</a></code> qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.</p></td>
+    </tr>
+    <tr>
+      <th>market_path</th>
+      <td><p>Character. File path to the combined market file.</p></td>
+    </tr>
+    <tr>
+      <th>strata_vars</th>
+      <td><p>Character vector. Names of the variables that together form strata.</p></td>
     </tr>
     <tr>
       <th>dir</th>

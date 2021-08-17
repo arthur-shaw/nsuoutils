@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nsuoutils</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
     <p>Applies <code><a href='sort_images_obs.html'>sort_images_obs()</a></code> over a list of product group folders</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sort_images_product</span><span class='op'>(</span><span class='va'>dir_in</span>, <span class='va'>unit_labels</span>, <span class='va'>dir_out</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sort_images_product</span><span class='op'>(</span><span class='va'>dir_in</span>, <span class='va'>interview_id_df</span>, <span class='va'>unit_labels</span>, <span class='va'>dir_out</span>, <span class='va'>strata_vars</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,12 +141,20 @@
       <td><p>Character. Folder for a single product group whose images to sort</p></td>
     </tr>
     <tr>
+      <th>interview_id_df</th>
+      <td><p>Data frame. Created by <code><a href='get_interview_ids.html'>get_interview_ids()</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>unit_labels</th>
       <td><p>Named numeric vector.</p></td>
     </tr>
     <tr>
       <th>dir_out</th>
       <td><p>Character. Root folder of destination folder for sorted images.</p></td>
+    </tr>
+    <tr>
+      <th>strata_vars</th>
+      <td><p>Character vector. Names of the variables that together form strata.</p></td>
     </tr>
     </table>
 

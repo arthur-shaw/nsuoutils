@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nsuoutils</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -131,7 +131,15 @@
     <p>Met une copie de chaque image dans le bon répertoire selon le produit-unité décelé dans le nom de l'image.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sort_images</span><span class='op'>(</span><span class='va'>inventory_df</span>, <span class='va'>dir_in</span>, image_dir_pattern <span class='op'>=</span> <span class='st'>"_Binary_"</span>, <span class='va'>dir_out</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sort_images</span><span class='op'>(</span>
+  <span class='va'>inventory_df</span>,
+  <span class='va'>data_dir</span>,
+  data_files <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"unitesFixes.dta"</span>, <span class='st'>"unitesautre1.dta"</span>, <span class='st'>"unitesautre1.dta"</span><span class='op'>)</span>,
+  <span class='va'>dir_in</span>,
+  image_dir_pattern <span class='op'>=</span> <span class='st'>"_Binary_"</span>,
+  <span class='va'>dir_out</span>,
+  <span class='va'>strata_vars</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,6 +147,14 @@
     <tr>
       <th>inventory_df</th>
       <td><p>Data frame. Base créée par <code><a href='inventory_product_units.html'>inventory_product_units()</a></code> qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.</p></td>
+    </tr>
+    <tr>
+      <th>data_dir</th>
+      <td><p>Character. Répertoire où trouver les bases fusionnées par <code><a href='combine_nsu_data.html'>combine_nsu_data()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>data_files</th>
+      <td><p>Character vector. Nom des bases d'où obtenir les identfiants des observations liées aux images.</p></td>
     </tr>
     <tr>
       <th>dir_in</th>
@@ -151,6 +167,10 @@
     <tr>
       <th>dir_out</th>
       <td><p>Character. Répertoire racine dans lequel se trouve les répertoires destinataires créés par <code><a href='create_image_dirs.html'>create_image_dirs()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>strata_vars</th>
+      <td><p>Character vector. Nom des variables qui, ensemblent, identifient les strates.</p></td>
     </tr>
     </table>
 

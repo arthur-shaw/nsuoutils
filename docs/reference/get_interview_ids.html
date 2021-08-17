@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rename variables to harmonized names — rename_variables • nsuoutils</title>
+<title>Get interview IDs — get_interview_ids • nsuoutils</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,9 @@
 
 
 
-<meta property="og:title" content="Rename variables to harmonized names — rename_variables" />
-<meta property="og:description" content="First, changes variable names by removing the product-specific component, thereby leaving harmonized names.
-Then, overwrite the input df in the global environment with an updated df." />
+<meta property="og:title" content="Get interview IDs — get_interview_ids" />
+<meta property="og:description" content="Get interview ID variables for all files with images.
+This data will the image sorting functions to construct a path to the strata folders." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -123,35 +123,28 @@ Then, overwrite the input df in the global environment with an updated df." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Rename variables to harmonized names</h1>
-    <small class="dont-index">Source: <a href='https://github.com/arthur-shaw/nsuoutils/blob/master/R/data.R'><code>R/data.R</code></a></small>
-    <div class="hidden name"><code>rename_variables.Rd</code></div>
+    <h1>Get interview IDs</h1>
+    <small class="dont-index">Source: <a href='https://github.com/arthur-shaw/nsuoutils/blob/master/R/images.R'><code>R/images.R</code></a></small>
+    <div class="hidden name"><code>get_interview_ids.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>First, changes variable names by removing the product-specific component, thereby leaving harmonized names.
-Then, overwrite the input df in the global environment with an updated df.</p>
+    <p>Get interview ID variables for all files with images.
+This data will the image sorting functions to construct a path to the strata folders.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rename_variables</span><span class='op'>(</span><span class='va'>df</span>, <span class='va'>df_type</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_interview_ids</span><span class='op'>(</span><span class='va'>path</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>Data frame whose columns to rename.</p></td>
-    </tr>
-    <tr>
-      <th>df_type</th>
-      <td><p>Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
-For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"</p></td>
+      <th>path</th>
+      <td><p>Character. Full path to combined data files of interest
+(i.e., unitesFixes.dta, unitesautre1.dta, and unitesautre2.dta)</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Data frame with whose columns have harmonized names.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

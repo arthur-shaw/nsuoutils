@@ -1,3 +1,8 @@
+# nsuoutils 0.2.0
+
+- Permet à `create_image_dirs()` de créer des répertoires produit-unité-strate où les strates sont définies par la combinaison de variables indiquée dans le paramètre `strata_vars`<
+- Dote `sort_images()` de la capacité à classer les images dans le système de répertoires produit-unité-strate
+
 # nsuoutils 0.1.5
 
 - Appliquer des corrections identifées dans les bases du Niger: des noms de variables qui ne suivent pas les consignes.
