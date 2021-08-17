@@ -1164,7 +1164,7 @@ find_market_file <- function(
 #' @param df_type Character. For consumption data, one of : "unitesFixes", "releve", "unitesautre1", "autre1releve", "unitesautre2", "autre2releve"
 #' For production data, one of: "unitesFixes", "unitesAutre1", "unitesAutre2"
 #' 
-#' @importFrom dplyr if_else bind_rows `%>%` slice starts_with everything left_join mutate
+#' @importFrom dplyr if_else bind_rows `%>%` slice starts_with everything left_join mutate select
 #' @importFrom stringr str_ends
 #' @importFrom purrr map walk2 pmap modify
 #' @importFrom fs path_ext_remove path_file
@@ -1328,6 +1328,23 @@ combine_nsu_in_dir <- function(
         nsu_combined <- nsu_combined %>%
             dplyr::left_join(product_name_id_map, by = "produit_nom")
     
+        # add market ID variables
+        market_id_vars <- market_df %>%
+            # add numeroReleve column if absent, as in BFA data
+            { 
+                if ((!"numeroReleve" %in% names(.)) & ("s0q19" %in% names(.))) {
+                    dplyr::mutate(.data = ., numeroReleve = .data$s0q19)
+                } else {
+                    .
+                }
+            } %>%
+            dplyr::select(
+                .data$interview__id, .data$interview__key, 
+                dplyr::matches("^s00q0[0-8]"), .data$numeroReleve
+            )
+        nsu_combined <- nsu_combined %>%
+            dplyr::left_join(market_id_vars, by = c("interview__id", "interview__key"))
+
     # if not, create empty entries:
     # - produit_id in the df
     # - produit_id entry in the labels
