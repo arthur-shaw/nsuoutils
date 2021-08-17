@@ -4,14 +4,19 @@
 \alias{sort_images_obs}
 \title{Sort images for an interview}
 \usage{
-sort_images_obs(dir_in, unit_labels, dir_out)
+sort_images_obs(dir_in, interview_id_df, unit_labels, dir_out, strata_vars)
 }
 \arguments{
 \item{dir_in}{Character. Folder for a single interview whose images to sort}
 
+\item{interview_id_df}{Data frame. Created by \code{get_interview_ids()}.
+Consists of \code{interview__id} and variables that begin with \code{"s01q01"} and \code{numeroReleve}.}
+
 \item{unit_labels}{Named numeric vector.}
 
 \item{dir_out}{Character. Root folder of destination folder for sorted images.}
+
+\item{strata_vars}{Character vector. Names of the variables that together form strata.}
 }
 \description{
 This workhorse function for \code{sort_images()} works within an interview folder of the exported images and copies images to their destination directory based on the product-unit found in the file name.
@@ -22,7 +27,7 @@ First, it determines where files should go by:
 \item Creating a list of files in the folder
 \item Parsing the file name into product name and unit code components
 \item Constructs a file name that includes the file's \code{interview__key}
-\item Constructing a destination file path
+\item Constructing a destination file path, composed of product, unit, and strata
 }
 
 Then, it moves the file to its destination directory by:

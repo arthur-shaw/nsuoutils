@@ -102,14 +102,73 @@ create_unit_dirs <- function(
 
 }
 
+#' Create dirs for strata
+#' 
+#' Create directories for each strata within each product-unit directory
+#' 
+#' Strata are the user-defined set of variables specified in `strata_vars`.
+#' The directory names will be hyphen-separated combinations of the variables that compose a strata (e.g., `"{region} - {urban_rural}"`)
+#'  
+#' @param inventory_df Data frame. Contains an inventory of the unique product-units with images.
+#' @param market_path Character. File path to the combined market file.
+#' @param strata_vars Character vector. Names of the variables that together form strata.
+#' @param dir Character. Directory where unit directories should be created.
+#' 
+#' @importFrom rlang syms .data
+#' @importFrom dplyr distinct `%>%` mutate across pull
+#' @importFrom tidyr expand_grid unite
+#' @importFrom haven as_factor
+#' @importFrom labelled to_character
+#' @importFrom fs dir_create
+create_strata_dirs <- function(
+    inventory_df,
+    market_path,
+    strata_vars,
+    dir
+) {
+
+    strata_vars <- rlang::syms(strata_vars)
+
+    # determine unique values of stratum variable(s)
+    marches <- haven::read_dta(file = market_path)
+    strata <- dplyr::distinct(marches, !!!strata_vars)
+
+    # expand product-unit data set to have one obs per strata
+    produits_unites_strata <- tidyr::expand_grid(inventory_df, strata)
+
+    strata_dirs <- produits_unites_strata %>%
+        dplyr::mutate(
+            unite_txt = haven::as_factor(.data$unite, levels = "labels"),
+            dplyr::across(
+                .cols = -c(.data$produit_nom, .data$unite, .data$unite_txt),
+                .fns = ~ labelled::to_character(.x)
+            )
+        ) %>%
+        tidyr::unite(
+            col = "strata_txt", 
+            -c(.data$produit_nom, .data$unite, .data$unite_txt), 
+            sep = " - ", 
+            remove = FALSE
+        ) %>%
+        dplyr::mutate(dirs = paste0(dir, "/", .data$produit_nom, "/", .data$unite_txt, "/", .data$strata_txt)) %>%
+        dplyr::pull(.data$dirs)
+
+    fs::dir_create(strata_dirs)
+
+}
+
 #' Créer un répertoire pour chaque produit-unité
 #' 
 #' @param inventory_df Data frame. Base créée par `inventory_product_units()` qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.
+#' @param market_path Character. File path to the combined market file.
+#' @param strata_vars Character vector. Names of the variables that together form strata.
 #' @param dir Character. Répertoire racine où les répertoires produit-unité doivent être créés.
 #' 
 #' @export 
 create_image_dirs <- function(
     inventory_df,
+    market_path,
+    strata_vars,
     dir
 ) {
 
@@ -125,6 +184,14 @@ create_image_dirs <- function(
         dir = dir
     )
 
+    # create strata directories within each product-unit directory in the inventory
+    create_strata_dirs(
+        inventory_df = inventory_df,
+        market_path = market_path,
+        strata_vars = strata_vars,
+        dir = dir
+    )
+
 }
 
 #' Sort images for an interview
@@ -136,7 +203,7 @@ create_image_dirs <- function(
 #' - Creating a list of files in the folder
 #' - Parsing the file name into product name and unit code components
 #' - Constructs a file name that includes the file's `interview__key`
-#' - Constructing a destination file path
+#' - Constructing a destination file path, composed of product, unit, and strata
 #' 
 #' Then, it moves the file to its destination directory by:
 #' 
@@ -145,22 +212,31 @@ create_image_dirs <- function(
 #' - If so, copying the file
 #' 
 #' @param dir_in Character. Folder for a single interview whose images to sort
+#' @param interview_id_df Data frame. Created by `get_interview_ids()`. 
+#' Consists of `interview__id` and variables that begin with `"s01q01"` and `numeroReleve`.
 #' @param unit_labels Named numeric vector.
 #' @param dir_out Character. Root folder of destination folder for sorted images.
+#' @param strata_vars Character vector. Names of the variables that together form strata.
 #' 
+#' @importFrom rlang syms .data
 #' @importFrom fs dir_ls path_ext_remove path_file path_dir file_copy
 #' @importFrom dplyr `%>%` case_when rename filter pull
 #' @importFrom stringr str_extract str_starts
+#' @importFrom labelled set_value_labels to_character
+#' @importFrom tidyr unite
 #' @importFrom glue glue glue_collapse
-#' @importFrom rlang .data
 sort_images_obs <- function(
     dir_in,
+    interview_id_df,
     unit_labels,
-    dir_out
+    dir_out,
+    strata_vars
 ) {
 
     # get list of all the files in the folder
     files <- fs::dir_ls(dir_in, type = "file")
+
+    strata_vars_syms <- rlang::syms(strata_vars)
 
     # construct new file names and addresses
     # new names are needed so that same-named files are not overwritten (e.g., two q109_avocat___147.jpg from different observations)
@@ -179,16 +255,29 @@ sort_images_obs <- function(
                 .data$question == "q119" ~ "0"
             ),
             unit_code = as.numeric(.data$unit_code),
-            interview_key = stringr::str_extract(.data$files, pattern = "(?<=)[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"),
-            image_name_new = glue::glue("{.data$question}_{.data$product_name}___{.data$unit_code}__{.data$interview_key}.jpg")
+            interview__key = stringr::str_extract(.data$files, pattern = "(?<=)[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"),
+            image_name_new = glue::glue("{.data$question}_{.data$product_name}___{.data$unit_code}__{.data$interview__key}.jpg")
         ) %>%
         labelled::set_value_labels(unit_code = unit_labels) %>%
+        dplyr::left_join(interview_id_df, by = c("interview__key", "question")) %>%   
         dplyr::mutate(
             unit_txt = haven::as_factor(.data$unit_code, levels = "labels"),
+            across(
+                c(!!!strata_vars_syms),
+                .fns = ~ labelled::to_character(.x)
+            )
+        ) %>%
+        tidyr::unite(
+            col = "strata_txt", 
+            !!!strata_vars_syms, 
+            sep = " - ", 
+            remove = FALSE
+        ) %>%
+        dplyr::mutate(
             path_new = dplyr::case_when(
                 # TODO: replace `image_out_dir` below with param name
-                .data$question %in% c("q109", "q114") ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}"),
-                .data$question == "q119" ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$image_name_new}")
+                .data$question %in% c("q109", "q114") ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$strata_txt}/{.data$image_name_new}"),
+                .data$question == "q119" ~ glue::glue("{dir_out}{.data$product_name}/{.data$unit_txt}/{.data$strata_txt}/{.data$image_name_new}")
             ),
             dir_old = fs::path_dir(.data$files),
             file_old = fs::path_file(.data$files),
@@ -227,15 +316,19 @@ sort_images_obs <- function(
 #' Applies `sort_images_obs()` over a list of product group folders
 #' 
 #' @param dir_in Character. Folder for a single product group whose images to sort
+#' @param interview_id_df Data frame. Created by `get_interview_ids()`. 
 #' @param unit_labels Named numeric vector.
+#' @param strata_vars Character vector. Names of the variables that together form strata.
 #' @param dir_out Character. Root folder of destination folder for sorted images.
 #' 
 #' @importFrom fs dir_ls
 #' @importFrom purrr walk
 sort_images_product <- function(
     dir_in,
+    interview_id_df,
     unit_labels,    
-    dir_out
+    dir_out,
+    strata_vars
 ) {
 
     # get list of folders whose files to move
@@ -246,8 +339,10 @@ sort_images_product <- function(
         .x = folders,
         .f = ~ sort_images_obs(
             dir_in = .x,
+            interview_id_df,
             unit_labels = unit_labels,
-            dir_out = dir_out
+            dir_out = dir_out,
+            strata_vars = strata_vars
         )
     )
 
@@ -266,20 +361,27 @@ sort_images_product <- function(
 #' - Copier chaque image depuis son répertoire source vers son répertoire destinataire (selon son produit-unité-taille)
 #' 
 #' @param inventory_df Data frame. Base créée par `inventory_product_units()` qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.
+#' @param data_dir Character. Répertoire où trouver les bases fusionnées par `combine_nsu_data()`.
+#' @param data_files Character vector. Nom des bases d'où obtenir les identfiants des observations liées aux images.
 #' @param dir_in Character. Répertoire racine dans lequel se trouve tous les répertoire d'images exportées de tous les produits.
 #' @param image_dir_pattern Character. Expression régulière qui identifie les répertoires d'images exportés dans le répertoire racine `dir_in`.
 #' @param dir_out Character. Répertoire racine dans lequel se trouve les répertoires destinataires créés par `create_image_dirs()`.
+#' @param strata_vars Character vector. Nom des variables qui, ensemblent, identifient les strates.
 #' 
 #' @importFrom fs dir_ls
 #' @importFrom labelled val_labels
-#' @importFrom purrr walk
+#' @importFrom purrr map walk
+#' @importFrom dplyr `%>%` bind_rows distinct
 #' 
 #' @export
 sort_images <- function(
     inventory_df,
+    data_dir,
+    data_files = c("unitesFixes.dta", "unitesautre1.dta", "unitesautre1.dta"),
     dir_in,
     image_dir_pattern = "_Binary_",
-    dir_out    
+    dir_out,
+    strata_vars    
 ) {
 
     # get list of product folders whose files to move
@@ -288,15 +390,55 @@ sort_images <- function(
     # extract value labels for units in order to contruct a path that uses the label
     unit_labels <- labelled::val_labels(inventory_df$unite)
 
+    # get interview IDs for constructing paths to strata folders
+    interview_id_df <- data_files %>%
+        purrr::map(.f = ~ get_interview_ids(path = paste0(data_dir, .x))) %>%
+        dplyr::bind_rows() %>%
+        dplyr::distinct(.data$interview__key, .data$question, .keep_all = TRUE)
+
     # apply image sorting function to each product folder
     purrr::walk(
         .x = folders,
         .f = ~ sort_images_product(
             dir_in = .x,
+            interview_id_df = interview_id_df,
             unit_labels = unit_labels,
-            dir_out = dir_out
+            dir_out = dir_out,
+            strata_vars = strata_vars
         )
     )
 
 }
 
+#' Get interview IDs
+#' 
+#' Get interview ID variables for all files with images.
+#' This data will the image sorting functions to construct a path to the strata folders.
+#' 
+#' @param path Character. Full path to combined data files of interest 
+#' (i.e., unitesFixes.dta, unitesautre1.dta, and unitesautre2.dta)
+#' 
+#' @importFrom haven read_dta
+#' @importFrom dplyr `%>%` mutate case_when select matches
+get_interview_ids <- function(path) {
+
+    df <- haven::read_dta(file = path)
+
+    col_names <- names(df)
+
+    df_keys <- df %>%
+        dplyr::mutate(
+            question = dplyr::case_when(
+                "q109" %in% col_names ~ "q109",
+                "q114_autre1" %in% col_names ~ "q114_autre1",
+                "q119_autre2" %in% col_names ~ "q119_autre2"
+            )
+        ) %>% 
+        dplyr::select(
+            .data$interview__key, .data$question,
+            dplyr::matches("^s00q0[0-8]")    
+        )
+
+    return(df_keys)
+
+}

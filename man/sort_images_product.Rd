@@ -4,14 +4,18 @@
 \alias{sort_images_product}
 \title{Sort images for a product group}
 \usage{
-sort_images_product(dir_in, unit_labels, dir_out)
+sort_images_product(dir_in, interview_id_df, unit_labels, dir_out, strata_vars)
 }
 \arguments{
 \item{dir_in}{Character. Folder for a single product group whose images to sort}
 
+\item{interview_id_df}{Data frame. Created by \code{get_interview_ids()}.}
+
 \item{unit_labels}{Named numeric vector.}
 
 \item{dir_out}{Character. Root folder of destination folder for sorted images.}
+
+\item{strata_vars}{Character vector. Names of the variables that together form strata.}
 }
 \description{
 Applies \code{sort_images_obs()} over a list of product group folders

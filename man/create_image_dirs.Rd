@@ -4,10 +4,14 @@
 \alias{create_image_dirs}
 \title{Créer un répertoire pour chaque produit-unité}
 \usage{
-create_image_dirs(inventory_df, dir)
+create_image_dirs(inventory_df, market_path, strata_vars, dir)
 }
 \arguments{
 \item{inventory_df}{Data frame. Base créée par \code{inventory_product_units()} qui fait l'inventaire complet des produits-unités des bases de l'enquête NSU.}
+
+\item{market_path}{Character. File path to the combined market file.}
+
+\item{strata_vars}{Character vector. Names of the variables that together form strata.}
 
 \item{dir}{Character. Répertoire racine où les répertoires produit-unité doivent être créés.}
 }
